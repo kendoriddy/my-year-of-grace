@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Year of Grace 2026
 
-## Getting Started
+A Next.js gratitude archive where people share free testimonies on a 2026 calendar and optionally lock one into the Grace Archive via Paystack.
 
-First, run the development server:
+## Stack
+
+- Next.js App Router + TypeScript
+- Tailwind CSS
+- PostgreSQL + Prisma 7
+- Paystack, Cloudinary, Resend, PostHog
+
+## Setup
+
+1. Copy `.env.example` to `.env` and fill in values.
+2. Start Postgres (or run `npx prisma dev` for local Prisma Postgres).
+3. Push schema and seed:
+
+```bash
+npm install
+npx prisma db push
+npm run db:seed
+```
+
+4. Start the app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Key routes
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `/` — homepage with live stats and 2026 calendar
+- `/share` — submit a testimony
+- `/t/[publicId]` — public testimony page
+- `/archive` — locked Grace Archive
+- `/[slug]` — locked custom URL
+- `/admin` — moderation dashboard (env credentials)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Admin
 
-## Learn More
+Sign in at `/admin/login` using `ADMIN_EMAIL` and `ADMIN_PASSWORD` from `.env`.
 
-To learn more about Next.js, take a look at the following resources:
+## Payments
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Paystack checkout is initialized server-side. Final lock assignment happens only after webhook/server verification in `/api/paystack/webhook` and `/api/paystack/verify`.

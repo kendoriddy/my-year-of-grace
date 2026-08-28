@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TestimonyStatus {
+  pending
+  approved
+  rejected
+  flagged
+  hidden
+}
+
+enum PaymentStatus {
+  pending
+  success
+  failed
+  refunded
+}
+
+enum SharePlatform {
+  whatsapp
+  facebook
+  x
+  copy
+  download
+}
+
+model Category {
+  id         String      @id @default(cuid())
+  name       String
+  emoji      String
+  slug       String      @unique
+  active     Boolean     @default(true)
+  sortOrder  Int         @default(0)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  testimonies Testimony[]
+}
+
+model Testimony {
+  id              String          @id @default(cuid())
+  publicId        String          @unique
+  manageTokenHash String
+  email           String?
+  occurredOn      DateTime        @db.Date
+  categoryId      String
+  category        Category        @relation(fields: [categoryId], references: [id])
+  content         String
+  displayName     String?
+  location        String?
+  imageUrl        String?
+  isAnonymous     Boolean         @default(false)
+  status          TestimonyStatus @default(pending)
+  isLocked        Boolean         @default(false)
+  contentHash     String
+  ipHash          String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  lockedArchive   LockedArchive?
+  payments        Payment[]
+  shares          Share[]
+
+  @@index([occurredOn])
+  @@index([status])
+  @@index([contentHash])
+  @@index([isLocked])
+}
+
+model LockedArchive {
+  id            String    @id @default(cuid())
+  testimonyId   String    @unique
+  testimony     Testimony @relation(fields: [testimonyId], references: [id])
+  archiveNumber Int       @unique
+  customSlug    String    @unique
+  paymentId     String    @unique
+  payment       Payment   @relation(fields: [paymentId], references: [id])
+  lockedAt      DateTime  @default(now())
+  slugDisabled  Boolean   @default(false)
+
+  @@index([customSlug])
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  testimonyId String
+  testimony   Testimony     @relation(fields: [testimonyId], references: [id])
+  provider    String        @default("paystack")
+  reference   String        @unique
+  amount      Int
+  currency    String        @default("NGN")
+  status      PaymentStatus @default(pending)
+  email       String?
+  metadata    Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  lockedArchive LockedArchive?
+
+  @@index([status])
+  @@index([testimonyId])
+}
+
+model Share {
+  id          String        @id @default(cuid())
+  testimonyId String
+  testimony   Testimony     @relation(fields: [testimonyId], references: [id])
+  platform    SharePlatform
+  createdAt   DateTime      @default(now())
+
+  @@index([testimonyId])
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReservedSlug {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
+model BlockedIdentity {
+  id        String   @id @default(cuid())
+  ipHash    String?
+  email     String?
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([ipHash])
+  @@index([email])
+}
+
+model AdminSession {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  email     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model RateLimitEntry {
+  id        String   @id @default(cuid())
+  key       String
+  action    String
+  createdAt DateTime @default(now())
+
+  @@index([key, action, createdAt])
+}
