@@ -74,14 +74,6 @@ export function ShareButtons({
       >
         {copied ? "Copied!" : "Copy Link"}
       </Button>
-      <Button asChild variant="ghost">
-        <a
-          href={`/api/og/${publicId}?download=1`}
-          onClick={() => recordShare("download")}
-        >
-          Download Image
-        </a>
-      </Button>
     </div>
   );
 }

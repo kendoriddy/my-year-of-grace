@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ShareButtons } from "@/components/share-buttons";
+import { ShareCard } from "@/components/share-card";
 import { LockCheckout } from "@/components/lock-checkout";
 import { Button } from "@/components/ui/button";
 import { formatLagosDate } from "@/lib/timezone";
@@ -89,7 +90,8 @@ export async function TestimonyView({
         </p>
       )}
 
-      <div className="mt-10 space-y-4">
+      <div className="mt-10 space-y-6">
+        <ShareCard publicId={testimony.publicId} locked={locked} />
         <ShareButtons
           publicId={testimony.publicId}
           content={testimony.content}
