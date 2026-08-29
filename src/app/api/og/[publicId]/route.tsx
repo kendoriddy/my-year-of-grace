@@ -38,23 +38,19 @@ export async function GET(
   const locked = testimony.archiveNumber != null && testimony.customSlug;
 
   const image = new ImageResponse(
-    (
-      <OgCard
-        theme={theme}
-        dateLabel={formatLagosDate(testimony.occurredOn)}
-        quote={truncate(testimony.content, 220)}
-        footerLabel={
-          locked
-            ? formatGraceNumber(testimony.archiveNumber!)
-            : "Shared in 2026"
-        }
-        urlLabel={
-          locked
-            ? `myyearofgrace.com/${testimony.customSlug}`
-            : `myyearofgrace.com/t/${publicId}`
-        }
-      />
-    ),
+    <OgCard
+      theme={theme}
+      dateLabel={formatLagosDate(testimony.occurredOn)}
+      quote={truncate(testimony.content, 220)}
+      footerLabel={
+        locked ? formatGraceNumber(testimony.archiveNumber!) : "Shared in 2026"
+      }
+      urlLabel={
+        locked
+          ? `myyearofgrace.com/${testimony.customSlug}`
+          : `myyearofgrace.com/t/${publicId}`
+      }
+    />,
     {
       width: 1200,
       height: 630,

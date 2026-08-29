@@ -64,7 +64,9 @@ export async function TestimonyView({
         </p>
       )}
 
-      <p className="text-sm text-ink/50">{formatLagosDate(testimony.occurredOn)}</p>
+      <p className="text-sm text-ink/50">
+        {formatLagosDate(testimony.occurredOn)}
+      </p>
       <p className="mt-2 text-sm text-ink/60">
         {testimony.category.emoji} {testimony.category.name}
       </p>

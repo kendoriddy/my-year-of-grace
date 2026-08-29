@@ -19,10 +19,14 @@ export function ShareButtons({
   locked = false,
 }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
-  const pageUrl = customUrl ? `${APP_URL}/${customUrl}` : `${APP_URL}/t/${publicId}`;
+  const pageUrl = customUrl
+    ? `${APP_URL}/${customUrl}`
+    : `${APP_URL}/t/${publicId}`;
   const text = `"${content.slice(0, 120)}..." — My Year of Grace 2026`;
 
-  async function recordShare(platform: "whatsapp" | "facebook" | "x" | "copy" | "download") {
+  async function recordShare(
+    platform: "whatsapp" | "facebook" | "x" | "copy" | "download",
+  ) {
     trackEvent("share_click", { platform, publicId, locked });
     await fetch("/api/shares", {
       method: "POST",
