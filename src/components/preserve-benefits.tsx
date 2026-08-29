@@ -1,8 +1,18 @@
-import { Sparkle } from "lucide-react";
+import {
+  Gift,
+  Hash,
+  ImageIcon,
+  Link2,
+  Lock,
+  Palette,
+  Sparkle,
+  Sparkles,
+} from "lucide-react";
 
 type PreserveBenefitsProps = {
   slug?: string;
   themeLabel?: string;
+  graceNumber?: string;
 };
 
 export function PreserveBenefits({
@@ -34,5 +44,71 @@ export function PreserveBenefits({
         </li>
       ))}
     </ul>
+  );
+}
+
+export function PreserveValueGrid({
+  slug,
+  themeLabel,
+  graceNumber,
+}: Readonly<PreserveBenefitsProps>) {
+  const items = [
+    {
+      icon: Lock,
+      title: "Preserved forever",
+      body: "Your testimony becomes part of the 2026 Grace Archive.",
+    },
+    {
+      icon: Link2,
+      title: "Your own link",
+      body: `myyearofgrace.com/${slug || "your-link"}`,
+    },
+    {
+      icon: Palette,
+      title: "Your design",
+      body: themeLabel
+        ? `Keep the ${themeLabel} style you just chose.`
+        : "Keep the style you just chose.",
+    },
+    {
+      icon: Sparkles,
+      title: "Your animated page",
+      body: "The preview becomes your permanent page.",
+    },
+    {
+      icon: ImageIcon,
+      title: "Your Grace Card",
+      body: "Download and share it.",
+    },
+    {
+      icon: Hash,
+      title: "Your Grace number",
+      body: graceNumber || "Assigned the moment you preserve it.",
+    },
+    {
+      icon: Gift,
+      title: "December 31",
+      body: "A special digital gift awaits you.",
+    },
+  ];
+
+  return (
+    <div className="mx-auto mt-10 grid gap-3 text-left sm:grid-cols-2">
+      {items.map((item) => {
+        const Icon = item.icon;
+        return (
+          <div
+            key={item.title}
+            className="rounded-2xl border border-ink/10 bg-paper/70 px-4 py-4"
+          >
+            <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-ember">
+              <Icon className="size-3.5" strokeWidth={1.7} aria-hidden />
+              {item.title}
+            </p>
+            <p className="mt-2 text-sm text-ink/75">{item.body}</p>
+          </div>
+        );
+      })}
+    </div>
   );
 }

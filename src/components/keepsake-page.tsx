@@ -31,6 +31,10 @@ const PARTICLES = [
   { top: "72%", left: "72%", delay: "1.8s", size: 3 },
   { top: "84%", left: "42%", delay: "2.6s", size: 4 },
   { top: "18%", left: "48%", delay: "3.4s", size: 2 },
+  { top: "8%", left: "62%", delay: "4.1s", size: 2 },
+  { top: "55%", left: "6%", delay: "2.9s", size: 3 },
+  { top: "91%", left: "70%", delay: "1.1s", size: 2 },
+  { top: "33%", left: "92%", delay: "3.8s", size: 4 },
 ];
 
 export function KeepsakePage({
@@ -65,6 +69,8 @@ export function KeepsakePage({
       }
     >
       <div className="keepsake-glow" />
+      <div className="keepsake-glow keepsake-glow-alt" />
+      <div className="keepsake-grain" />
       {PARTICLES.map((particle, index) => (
         <span
           key={index}
@@ -92,7 +98,7 @@ export function KeepsakePage({
           My Year of Grace
         </p>
         <p
-          className="keepsake-reveal mt-3 font-serif text-5xl text-[color:var(--k-text)] md:text-6xl"
+          className="keepsake-reveal mt-3 font-serif text-6xl text-[color:var(--k-text)] md:text-7xl"
           style={{ animationDelay: "0.12s" }}
         >
           2026
@@ -136,10 +142,11 @@ export function KeepsakePage({
         </p>
 
         <div
-          className="keepsake-reveal mx-auto mt-12 max-w-md border-t border-[color:var(--k-accent)]/20 pt-8"
+          className="keepsake-reveal mx-auto mt-12 max-w-md border-t border-[color:var(--k-accent)]/25 pt-8"
           style={{ animationDelay: "0.78s" }}
         >
-          <p className="font-serif text-xl text-[color:var(--k-text)]">
+          <div className="keepsake-ornament" aria-hidden />
+          <p className="font-serif text-xl text-[color:var(--k-text)] md:text-2xl">
             This moment mattered to me.
           </p>
           <p className="mt-2 text-sm text-[color:var(--k-muted)]">

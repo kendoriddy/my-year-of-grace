@@ -58,6 +58,7 @@ export function ShareForm({ categories, defaultDate }: ShareFormProps) {
       const data = (await response.json()) as {
         error?: string;
         publicId?: string;
+        manageToken?: string;
       };
 
       if (!response.ok) {
@@ -65,7 +66,11 @@ export function ShareForm({ categories, defaultDate }: ShareFormProps) {
       }
 
       trackEvent("testimony_complete", { publicId: data.publicId || "" });
-      router.push(`/preserve/${data.publicId}?submitted=1`);
+      if (data.manageToken) {
+        router.push(`/manage/${data.manageToken}?submitted=1`);
+      } else {
+        router.push(`/preserve/${data.publicId}?submitted=1`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -176,9 +181,7 @@ export function ShareForm({ categories, defaultDate }: ShareFormProps) {
             }}
           />
           {uploading && <p className="text-xs text-ink/50">Uploading photo…</p>}
-          {imageUrl && (
-            <p className="text-xs text-emerald-800">Photo added.</p>
-          )}
+          {imageUrl && <p className="text-xs text-emerald-800">Photo added.</p>}
         </div>
 
         <fieldset className="space-y-3">

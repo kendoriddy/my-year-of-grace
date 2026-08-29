@@ -2,12 +2,18 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { KeepsakePage } from "@/components/keepsake-page";
-import { PreserveBenefits } from "@/components/preserve-benefits";
+import { PreserveValueGrid } from "@/components/preserve-benefits";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Check } from "lucide-react";
 import { PALETTES, PALETTE_IDS, type PaletteId } from "@/lib/palettes";
-import { formatNaira, previewGraceNumber, slugify } from "@/lib/utils";
+import {
+  formatGraceNumber,
+  formatNaira,
+  previewGraceNumber,
+  slugify,
+} from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
 
 type PreserveExperienceProps = {
@@ -45,7 +51,7 @@ export function PreserveExperience({
     initialSlug || slugify(author) || "my-grace",
   );
   const [themeId, setThemeId] = useState<PaletteId>(
-    (initialThemeId as PaletteId) || "grace",
+    (initialThemeId as PaletteId) || "midnight",
   );
   const [email, setEmail] = useState(initialEmail || "");
   const [slugStatus, setSlugStatus] = useState<
@@ -185,27 +191,31 @@ export function PreserveExperience({
   return (
     <div>
       {submitted && (
-        <div className="bg-terracotta/10 px-4 py-4 text-center text-sm text-terracotta">
-          Your testimony has been added.
+        <div className="bg-ember/10 px-4 py-3 text-center text-sm text-ember">
+          Your testimony is live. Now give it a place of its own.
         </div>
       )}
 
       <section className="mx-auto max-w-3xl px-4 py-12 text-center">
         <p className="text-xs uppercase tracking-[0.24em] text-ember">
-          Preview your preserved testimony
+          Your preservation studio
         </p>
         <h1 className="mt-4 font-serif text-4xl text-ink md:text-5xl">
-          Your testimony deserves its own place on the internet.
+          Create your place on the internet
         </h1>
         <p className="mt-4 text-ink/65">
-          Choose your link and visual style, then experience the page before you
-          preserve it forever.
+          Choose your link and style, then see the exact page you&apos;ll keep.
         </p>
       </section>
 
       <section className="mx-auto max-w-3xl space-y-8 px-4 pb-10">
         <div className="rounded-3xl border border-ink/10 bg-white/80 p-5 md:p-6">
-          <Label htmlFor="slug">Claim your custom link</Label>
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-ember">
+            1 · Choose your link
+          </p>
+          <Label htmlFor="slug" className="mt-3 block">
+            Claim your custom link
+          </Label>
           <p className="mt-1 text-sm text-ink/55">
             Claim your custom link before someone else does.
           </p>
@@ -230,14 +240,25 @@ export function PreserveExperience({
               <span className="text-ink/50">Checking availability…</span>
             )}
             {slugStatus === "available" && (
-              <span className="text-emerald-800">
-                myyearofgrace.com/{slug} is available.
+              <span className="inline-flex items-center gap-1.5 text-emerald-800">
+                <Check className="size-4" strokeWidth={2.2} aria-hidden />
+                Available
               </span>
             )}
             {slugStatus === "taken" && (
               <span className="text-red-700">{slugError}</span>
             )}
           </p>
+          {slugStatus === "available" && slug && (
+            <div className="mt-4 rounded-2xl border border-ember/15 bg-ember/5 px-4 py-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-ember">
+                This will be your personal link
+              </p>
+              <p className="mt-1 font-serif text-xl text-ink md:text-2xl">
+                myyearofgrace.com/{slug}
+              </p>
+            </div>
+          )}
           {suggestions.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {suggestions.map((item) => (
@@ -255,8 +276,11 @@ export function PreserveExperience({
         </div>
 
         <div>
-          <p className="text-sm font-medium text-ink/80">
-            Choose a visual theme
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-ember">
+            2 · Choose your style
+          </p>
+          <p className="mt-3 text-sm font-medium text-ink/80">
+            Pick a visual theme. The page below will change with it.
           </p>
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-5">
             {PALETTE_IDS.map((id) => {
@@ -294,30 +318,52 @@ export function PreserveExperience({
         </div>
       </section>
 
-      <div className="overflow-hidden rounded-[2rem] border border-ink/10 mx-3 md:mx-8">
-        <KeepsakePage testimony={keepsake} preview showAcquisition={false} />
-      </div>
+      <section className="px-3 pb-6 md:px-8">
+        <div className="mx-auto max-w-3xl pb-5 text-center">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-ember">
+            3 · See your page
+          </p>
+          <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
+            Here&apos;s what your preserved page will look like.
+          </h2>
+          <p className="mt-2 text-sm text-ink/55">
+            This is the real page — not a mockup.
+          </p>
+        </div>
+        <div className="overflow-hidden rounded-[2rem] border border-ink/10">
+          <KeepsakePage
+            key={`${themeId}-${slug}`}
+            testimony={keepsake}
+            preview
+            showAcquisition={false}
+          />
+        </div>
+      </section>
 
       <section className="mx-auto max-w-3xl px-4 py-16">
         <div className="rounded-[2rem] border border-ember/20 bg-white p-6 text-center shadow-sm md:p-10">
           <p className="text-xs uppercase tracking-[0.24em] text-ember">
-            Preserve it forever
+            You just created something worth keeping.
           </p>
-          <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
+          <h2 className="mt-4 font-serif text-3xl text-ink md:text-4xl">
             Your testimony deserves its own place on the internet.
           </h2>
-          <p className="mt-3 text-ink/65">
-            Preserve this experience forever for {formatNaira(priceKobo)}.
+          <p className="mt-4 text-lg text-ink/70">
+            Give it a permanent home for {formatNaira(priceKobo)}.
           </p>
 
-          <PreserveBenefits slug={slug} themeLabel={PALETTES[themeId].label} />
+          <PreserveValueGrid
+            slug={slug}
+            themeLabel={PALETTES[themeId].label}
+            graceNumber={formatGraceNumber(previewNumber)}
+          />
 
-          <p className="mt-8 text-sm text-ink/60">
-            Only 10,000 preserved places are available for 2026.
+          <p className="mt-10 text-sm text-ink/60">
+            Only {capacity.toLocaleString()} testimonies can be preserved in the
+            2026 Grace Archive.
           </p>
           <p className="mt-1 text-sm font-medium text-ember">
-            {remaining.toLocaleString()} preserved places remaining of{" "}
-            {capacity.toLocaleString()}
+            {remaining.toLocaleString()} places remaining.
           </p>
 
           {!initialEmail && (

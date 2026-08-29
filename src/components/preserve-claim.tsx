@@ -47,19 +47,22 @@ export function PreserveClaim({
     <section className="mx-auto max-w-3xl px-4 py-16">
       <div className="rounded-[2rem] border border-ember/20 bg-white p-6 text-center shadow-sm md:p-10">
         <p className="text-xs uppercase tracking-[0.24em] text-ember">
-          Is this your testimony?
+          Coming back to this testimony?
         </p>
         <h1 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
           Preserve it forever.
         </h1>
         <p className="mt-3 text-ink/65">
-          Enter the email you used when you shared it, and we&apos;ll open your
-          preserve page.
+          If you just shared this, open it from the same browser. If you&apos;re
+          on a new device, enter the email you used when you shared it.
         </p>
 
         <PreserveBenefits slug={slug} />
 
-        <form onSubmit={handleSubmit} className="mx-auto mt-8 max-w-sm text-left">
+        <form
+          onSubmit={handleSubmit}
+          className="mx-auto mt-8 max-w-sm text-left"
+        >
           <Label htmlFor="claim-email">Email you used to share</Label>
           <Input
             id="claim-email"

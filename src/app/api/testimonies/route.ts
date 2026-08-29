@@ -11,7 +11,9 @@ export async function POST(request: Request) {
 
     const cookieStore = await cookies();
     const existing = cookieStore.get(MANAGE_COOKIE)?.value;
-    const tokens = existing ? (JSON.parse(existing) as Record<string, string>) : {};
+    const tokens = existing
+      ? (JSON.parse(existing) as Record<string, string>)
+      : {};
     tokens[publicId] = manageToken;
     cookieStore.set(MANAGE_COOKIE, JSON.stringify(tokens), {
       httpOnly: true,
@@ -24,6 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       publicId: testimony.publicId,
       status: testimony.status,
+      manageToken,
     });
   } catch (error) {
     const message =

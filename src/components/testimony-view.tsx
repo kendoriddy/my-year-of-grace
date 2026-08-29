@@ -124,7 +124,7 @@ export async function TestimonyView({
           </h2>
           <p className="mt-3 text-sm text-ink/65">
             {canManage
-              ? `Preview your custom page, then preserve it in the 2026 Grace Archive for ${formatNaira(priceKobo)}.`
+              ? `Preview your custom page, then give it a permanent home for ${formatNaira(priceKobo)}.`
               : "If this story is yours, give it a permanent home in the 2026 Grace Archive."}
           </p>
           <PreserveBenefits

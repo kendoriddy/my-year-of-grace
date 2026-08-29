@@ -8,8 +8,12 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function ManagePage({ params }: PageProps<"/manage/[token]">) {
+export default async function ManagePage({
+  params,
+  searchParams,
+}: PageProps<"/manage/[token]">) {
   const { token } = await params;
+  const query = await searchParams;
 
   const candidates = await prisma.testimony.findMany({
     where: { status: "approved" },
@@ -33,7 +37,9 @@ export default async function ManagePage({ params }: PageProps<"/manage/[token]"
 
   const cookieStore = await cookies();
   const existing = cookieStore.get(MANAGE_COOKIE)?.value;
-  const tokens = existing ? (JSON.parse(existing) as Record<string, string>) : {};
+  const tokens = existing
+    ? (JSON.parse(existing) as Record<string, string>)
+    : {};
   tokens[matched.publicId] = token;
   cookieStore.set(MANAGE_COOKIE, JSON.stringify(tokens), {
     httpOnly: true,
@@ -47,5 +53,7 @@ export default async function ManagePage({ params }: PageProps<"/manage/[token]"
     redirect(`/${matched.lockedArchive.customSlug}`);
   }
 
-  redirect(`/preserve/${matched.publicId}`);
+  redirect(
+    `/preserve/${matched.publicId}${query.submitted === "1" ? "?submitted=1" : ""}`,
+  );
 }

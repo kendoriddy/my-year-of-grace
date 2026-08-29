@@ -36,7 +36,8 @@ body {
   overflow: hidden;
   color: var(--k-text);
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, var(--k-glow), transparent 58%),
+    radial-gradient(ellipse 90% 55% at 50% -8%, var(--k-glow), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 90%, var(--k-glow), transparent 70%),
     linear-gradient(180deg, var(--k-bg) 0%, var(--k-bg-alt) 100%);
 }
 
@@ -50,6 +51,34 @@ body {
   filter: blur(80px);
   opacity: 0.7;
   animation: keepsake-breathe 8s ease-in-out infinite;
+}
+
+.keepsake-glow-alt {
+  inset: auto 20% 8%;
+  height: 28%;
+  opacity: 0.4;
+  animation-delay: -3s;
+}
+
+.keepsake-grain {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.35) 0.6px,
+    transparent 0.6px
+  );
+  background-size: 3px 3px;
+}
+
+.keepsake-ornament {
+  margin: 0 auto 1.25rem;
+  width: 48px;
+  height: 10px;
+  background: linear-gradient(90deg, transparent, var(--k-accent), transparent);
+  opacity: 0.55;
 }
 
 .keepsake-particle {
