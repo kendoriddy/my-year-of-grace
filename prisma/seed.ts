@@ -1,13 +1,14 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { getPgPoolConfig } from "../src/lib/db-config";
 import {
   DEFAULT_CATEGORIES,
   DEFAULT_SETTINGS,
   SYSTEM_RESERVED_SLUGS,
 } from "../src/lib/constants";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const adapter = new PrismaPg(getPgPoolConfig());
 const prisma = new PrismaClient({ adapter });
 
 async function main() {

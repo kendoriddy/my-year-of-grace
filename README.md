@@ -12,7 +12,7 @@ A Next.js gratitude archive where people share free testimonies on a 2026 calend
 ## Setup
 
 1. Copy `.env.example` to `.env` and fill in values.
-2. Start Postgres (or run `npx prisma dev` for local Prisma Postgres).
+2. **Supabase database** — see [Supabase connection](#supabase-connection) below.
 3. Push schema and seed:
 
 ```bash
@@ -26,6 +26,35 @@ npm run db:seed
 ```bash
 npm run dev
 ```
+
+## Supabase connection
+
+Supabase’s **direct** host (`db.[ref].supabase.co:5432`) is **IPv6-only**. Many local networks and tools cannot reach it, which causes:
+
+`P1001: Can't reach database server at db.xxx.supabase.co`
+
+**Fix:** use the **pooler** connection string from Supabase Dashboard → **Project Settings → Database → Connect**.
+
+| Use case                | Supabase mode          | Port               | User format              |
+| ----------------------- | ---------------------- | ------------------ | ------------------------ |
+| Vercel / production app | **Transaction pooler** | 6543               | `postgres.[project-ref]` |
+| Local `db push` / seed  | **Session pooler**     | 5432 (pooler host) | `postgres.[project-ref]` |
+
+Always include `?sslmode=require` (never `sslmode=disable`).
+
+**Vercel env example:**
+
+```
+DATABASE_URL=postgresql://postgres.[ref]:[PASSWORD]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require
+```
+
+**Local `.env` for migrations** (Session pooler from dashboard):
+
+```
+DATABASE_URL=postgresql://postgres.[ref]:[PASSWORD]@aws-0-[region].pooler.supabase.com:5432/postgres?sslmode=require
+```
+
+Also check in Supabase: **Project is not paused** (free tier pauses after inactivity → click **Restore**).
 
 ## Key routes
 
