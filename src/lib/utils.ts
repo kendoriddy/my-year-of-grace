@@ -9,6 +9,16 @@ export function formatGraceNumber(n: number): string {
   return `GRACE #${String(n).padStart(6, "0")}`;
 }
 
+/** Stable preview number so the keepsake never shows a placeholder. */
+export function previewGraceNumber(seed: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < seed.length; i++) {
+    hash ^= seed.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (Math.abs(hash) % 10000) + 1;
+}
+
 export function formatNaira(kobo: number): string {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",

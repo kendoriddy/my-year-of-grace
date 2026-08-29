@@ -15,13 +15,13 @@ export async function sendLockConfirmationEmail(params: {
   await resend.emails.send({
     from: "My Year of Grace <hello@myyearofgrace.com>",
     to: params.email,
-    subject: "Your testimony is locked in the 2026 Grace Archive",
+    subject: "Your testimony is preserved in the 2026 Grace Archive",
     html: `
-      <p>Your testimony is now preserved in the 2026 Grace Archive.</p>
+      <p>Your testimony now has its own place on the internet.</p>
       <p><strong>${formatGraceNumber(params.archiveNumber)}</strong></p>
-      <p>Permanent page: <a href="${APP_URL}/${params.customSlug}">${CANONICAL_DOMAIN}/${params.customSlug}</a></p>
+      <p>Your page: <a href="${APP_URL}/${params.customSlug}">${CANONICAL_DOMAIN}/${params.customSlug}</a></p>
       <p>Amount paid: ${formatNaira(params.amountKobo)}</p>
-      <p>🎁 Something is waiting for you on December 31.</p>
+      <p>Something special is waiting for you on December 31.</p>
     `,
   });
 }

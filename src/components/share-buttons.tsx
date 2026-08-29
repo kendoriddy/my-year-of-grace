@@ -10,6 +10,7 @@ type ShareButtonsProps = {
   content: string;
   customUrl?: string;
   locked?: boolean;
+  prominent?: boolean;
 };
 
 export function ShareButtons({
@@ -17,15 +18,21 @@ export function ShareButtons({
   content,
   customUrl,
   locked = false,
+  prominent = false,
 }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
   const pageUrl = customUrl
     ? `${APP_URL}/${customUrl}`
     : `${APP_URL}/t/${publicId}`;
-  const text = `"${content.slice(0, 120)}..." — My Year of Grace 2026`;
+  const whatsappText = locked
+    ? `🙏 I just preserved my 2026 testimony with My Year of Grace.\n\n${pageUrl}\n\nBefore the year ends, what has God done for you?\nTell your story:\n${APP_URL}`
+    : `"${content.slice(0, 120)}..." — My Year of Grace 2026\n${pageUrl}`;
+  const tweetText = locked
+    ? `I preserved my 2026 testimony with My Year of Grace.`
+    : `"${content.slice(0, 120)}..." — My Year of Grace 2026`;
 
   async function recordShare(
-    platform: "whatsapp" | "facebook" | "x" | "copy" | "download",
+    platform: "whatsapp" | "facebook" | "x" | "copy" | "download" | "instagram",
   ) {
     trackEvent("share_click", { platform, publicId, locked });
     await fetch("/api/shares", {
@@ -36,10 +43,10 @@ export function ShareButtons({
   }
 
   return (
-    <div className="flex flex-wrap gap-3">
-      <Button asChild variant="default">
+    <div className={prominent ? "grid gap-3 sm:grid-cols-2" : "flex flex-wrap gap-3"}>
+      <Button asChild variant="ember" className={prominent ? "sm:col-span-2" : undefined}>
         <a
-          href={`https://wa.me/?text=${encodeURIComponent(`${text}\n${pageUrl}`)}`}
+          href={`https://wa.me/?text=${encodeURIComponent(whatsappText)}`}
           target="_blank"
           rel="noreferrer"
           onClick={() => recordShare("whatsapp")}
@@ -49,22 +56,20 @@ export function ShareButtons({
       </Button>
       <Button asChild variant="secondary">
         <a
-          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() => recordShare("facebook")}
+          href={`/api/og/${publicId}?ratio=story&download=1`}
+          onClick={() => recordShare("instagram")}
         >
-          Facebook
+          Share to Instagram
         </a>
       </Button>
       <Button asChild variant="secondary">
         <a
-          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(pageUrl)}`}
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(pageUrl)}`}
           target="_blank"
           rel="noreferrer"
           onClick={() => recordShare("x")}
         >
-          X
+          Share to X
         </a>
       </Button>
       <Button

@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { PaymentStatus } from "@/generated/prisma/client";
 import { verifyPaystackPayment } from "@/lib/paystack";
 import { getArchiveCapacity } from "@/lib/settings";
+import { getPalette } from "@/lib/palettes";
+import { isSlugAvailable, releaseSlugHolds } from "@/lib/slugs";
 
 export async function finalizeLockFromPayment(reference: string) {
   const payment = await prisma.payment.findUnique({
@@ -44,7 +46,7 @@ export async function finalizeLockFromPayment(reference: string) {
         where: { id: payment.id },
         data: { status: PaymentStatus.failed },
       });
-      throw new Error("The 2026 Grace Archive is full.");
+      throw new Error("The 2026 Grace Archive is now full.");
     }
 
     if (payment.testimony.isLocked) {
@@ -58,6 +60,27 @@ export async function finalizeLockFromPayment(reference: string) {
       select: { archiveNumber: true },
     });
     const archiveNumber = (last?.archiveNumber ?? 0) + 1;
+    const fallbackSlug = `grace-${String(archiveNumber).padStart(6, "0")}`;
+
+    const metadata = (payment.metadata ?? {}) as {
+      preferredSlug?: string;
+      themeId?: string;
+    };
+    const preferredSlug =
+      payment.testimony.preferredSlug || metadata.preferredSlug || "";
+    const themeId = getPalette(
+      payment.testimony.themeId || metadata.themeId,
+    ).id;
+
+    let customSlug = fallbackSlug;
+    if (
+      preferredSlug &&
+      (await isSlugAvailable(preferredSlug, {
+        ignoreTestimonyId: payment.testimonyId,
+      }))
+    ) {
+      customSlug = preferredSlug;
+    }
 
     await tx.payment.update({
       where: { id: payment.id },
@@ -66,15 +89,17 @@ export async function finalizeLockFromPayment(reference: string) {
 
     await tx.testimony.update({
       where: { id: payment.testimonyId },
-      data: { isLocked: true },
+      data: { isLocked: true, themeId },
     });
 
     const locked = await tx.lockedArchive.create({
       data: {
         testimonyId: payment.testimonyId,
         archiveNumber,
-        customSlug: `grace-${String(archiveNumber).padStart(6, "0")}`,
+        customSlug,
         paymentId: payment.id,
+        themeId,
+        giftEligible: true,
       },
     });
 
@@ -88,6 +113,9 @@ export async function finalizeLockFromPayment(reference: string) {
       }).catch(() => undefined);
     }
 
+    return locked;
+  }).then(async (locked) => {
+    await releaseSlugHolds(payment.testimonyId).catch(() => undefined);
     return locked;
   });
 }
@@ -103,11 +131,11 @@ export async function assignCustomSlug(
   });
 
   if (!testimony?.lockedArchive) {
-    throw new Error("Testimony is not locked.");
+    throw new Error("Testimony is not preserved yet.");
   }
 
-  const { isSlugAvailable } = await import("@/lib/slugs");
-  if (!(await isSlugAvailable(slug))) {
+  const { isSlugAvailable: check } = await import("@/lib/slugs");
+  if (!(await check(slug))) {
     throw new Error("That URL is not available.");
   }
 
@@ -122,6 +150,31 @@ export async function assignCustomSlug(
   });
 }
 
+export async function savePreservationIntent(params: {
+  testimonyId: string;
+  preferredSlug: string;
+  themeId: string;
+}) {
+  const themeId = getPalette(params.themeId).id;
+  const available = await isSlugAvailable(params.preferredSlug, {
+    ignoreTestimonyId: params.testimonyId,
+  });
+  if (!available) {
+    throw new Error("That URL is not available.");
+  }
+
+  const { holdSlug } = await import("@/lib/slugs");
+  await holdSlug(params.preferredSlug, params.testimonyId);
+
+  return prisma.testimony.update({
+    where: { id: params.testimonyId },
+    data: {
+      preferredSlug: params.preferredSlug,
+      themeId,
+    },
+  });
+}
+
 export async function createPendingLockPayment(
   testimonyId: string,
   email?: string | null,
@@ -133,8 +186,8 @@ export async function createPendingLockPayment(
   ]);
 
   if (!testimony) throw new Error("Testimony not found.");
-  if (testimony.isLocked) throw new Error("Already locked.");
-  if (capacityStats.isFull) throw new Error("The 2026 Grace Archive is full.");
+  if (testimony.isLocked) throw new Error("Already preserved.");
+  if (capacityStats.isFull) throw new Error("The 2026 Grace Archive is now full.");
 
   const { buildPaystackReference } = await import("@/lib/paystack");
   const reference = buildPaystackReference(testimonyId);
@@ -146,7 +199,11 @@ export async function createPendingLockPayment(
       amount,
       email: email || testimony.email,
       status: PaymentStatus.pending,
-      metadata: { testimonyPublicId: testimony.publicId },
+      metadata: {
+        testimonyPublicId: testimony.publicId,
+        preferredSlug: testimony.preferredSlug,
+        themeId: testimony.themeId,
+      },
     },
   });
 }

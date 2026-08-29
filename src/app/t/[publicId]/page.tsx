@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { TestimonyView } from "@/components/testimony-view";
 import { getApprovedTestimony } from "@/lib/testimonies";
+import { canManageTestimony } from "@/lib/auth";
 import { formatLagosDate } from "@/lib/timezone";
 import { CANONICAL_DOMAIN } from "@/lib/env";
 
@@ -33,6 +34,10 @@ export default async function TestimonyPage({
   const query = await searchParams;
   const testimony = await getApprovedTestimony(publicId);
   if (!testimony) notFound();
+
+  if (query.submitted === "1" && !testimony.isLocked && (await canManageTestimony(publicId))) {
+    redirect(`/preserve/${publicId}?submitted=1`);
+  }
 
   return (
     <TestimonyView

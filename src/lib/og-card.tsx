@@ -6,6 +6,8 @@ type OgCardProps = {
   quote: string;
   footerLabel: string;
   urlLabel: string;
+  author?: string;
+  ratio?: "og" | "story" | "square";
 };
 
 export function OgCard({
@@ -14,7 +16,14 @@ export function OgCard({
   quote,
   footerLabel,
   urlLabel,
+  author,
+  ratio = "og",
 }: OgCardProps) {
+  const isStory = ratio === "story";
+  const padding = isStory ? 72 : 64;
+  const brandSize = isStory ? 22 : 28;
+  const quoteSize = isStory ? 46 : ratio === "square" ? 40 : 42;
+
   return (
     <div
       style={{
@@ -23,42 +32,96 @@ export function OgCard({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        background: theme.background,
+        background: `linear-gradient(180deg, ${theme.background} 0%, ${theme.backgroundAlt} 100%)`,
         color: theme.text,
-        padding: "64px",
-        fontFamily: "serif",
+        padding,
+        fontFamily: "Georgia, serif",
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <div
           style={{
-            fontSize: 28,
-            letterSpacing: 4,
+            display: "flex",
+            fontSize: brandSize,
+            letterSpacing: 6,
             textTransform: "uppercase",
             color: theme.accent,
           }}
         >
           My Year of Grace
         </div>
-        <div style={{ fontSize: 24, marginTop: 16, color: theme.muted }}>
+        <div
+          style={{
+            display: "flex",
+            fontSize: isStory ? 22 : 24,
+            marginTop: 16,
+            color: theme.muted,
+          }}
+        >
           {dateLabel}
         </div>
       </div>
-      <div style={{ fontSize: 42, lineHeight: 1.3, maxWidth: "900px" }}>
-        “{quote}”
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            fontSize: quoteSize,
+            lineHeight: 1.35,
+            maxWidth: isStory ? 920 : 900,
+          }}
+        >
+          {`“${quote}”`}
+        </div>
+        {author ? (
+          <div
+            style={{
+              display: "flex",
+              fontSize: 24,
+              marginTop: 28,
+              color: theme.muted,
+            }}
+          >
+            {`— ${author}`}
+          </div>
+        ) : null}
       </div>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          fontSize: 24,
+          fontSize: 22,
           alignItems: "flex-end",
         }}
       >
-        <div style={{ color: theme.muted }}>2026</div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ color: theme.text }}>{footerLabel}</div>
-          <div style={{ fontSize: 20, marginTop: 8, color: theme.muted }}>
+        <div style={{ display: "flex", color: theme.muted }}>2026</div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+          }}
+        >
+          <div style={{ display: "flex", color: theme.accent }}>
+            {footerLabel}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 20,
+              marginTop: 8,
+              color: theme.muted,
+            }}
+          >
             {urlLabel}
           </div>
         </div>

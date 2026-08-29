@@ -15,6 +15,7 @@ type TestimonyCardProps = {
     lockedArchive?: {
       archiveNumber: number;
       customSlug: string;
+      themeId?: string | null;
     } | null;
   };
 };
@@ -44,7 +45,7 @@ export function TestimonyCard({ testimony }: TestimonyCardProps) {
           <span>— {author}{testimony.location ? `, ${testimony.location}` : ""}</span>
           {testimony.lockedArchive && (
             <span className="text-ember">
-              {formatGraceNumber(testimony.lockedArchive.archiveNumber)}
+              Preserved · {formatGraceNumber(testimony.lockedArchive.archiveNumber)}
             </span>
           )}
         </div>

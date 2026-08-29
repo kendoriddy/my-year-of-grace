@@ -51,7 +51,7 @@ export default async function AdminDashboardPage() {
   const cards = [
     { label: "Total testimonies", value: stats.totalTestimonies.toLocaleString() },
     { label: "Today's submissions", value: todayCount.toLocaleString() },
-    { label: "Total locked", value: archiveStats.claimed.toLocaleString() },
+    { label: "Total preserved", value: archiveStats.claimed.toLocaleString() },
     {
       label: "Remaining slots",
       value: archiveStats.remaining.toLocaleString(),
@@ -62,7 +62,7 @@ export default async function AdminDashboardPage() {
     },
     { label: "Payment success rate", value: `${successRate}%` },
     { label: "Shares", value: shareCount.toLocaleString() },
-    { label: "Lock price", value: formatNaira(priceKobo) },
+    { label: "Preserve price", value: formatNaira(priceKobo) },
   ];
 
   const flagged = await prisma.testimony.count({

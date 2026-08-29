@@ -58,7 +58,7 @@ export default async function YearEndPage() {
         </div>
         <div className="rounded-2xl border border-ink/10 bg-white/70 p-6">
           <p className="font-serif text-4xl">{stats.lockedCount.toLocaleString()}</p>
-          <p className="mt-2 text-sm text-ink/60">locked memories</p>
+          <p className="mt-2 text-sm text-ink/60">preserved memories</p>
         </div>
         <div className="rounded-2xl border border-ink/10 bg-white/70 p-6">
           <p className="font-serif text-4xl">{stats.categories.length}</p>

@@ -95,6 +95,16 @@ export async function createTestimony(input: TestimonyInput) {
   return { testimony, manageToken, publicId };
 }
 
+export async function getTestimonyByPublicId(publicId: string) {
+  return prisma.testimony.findUnique({
+    where: { publicId },
+    include: {
+      category: true,
+      lockedArchive: true,
+    },
+  });
+}
+
 export async function getApprovedTestimony(publicId: string) {
   return prisma.testimony.findFirst({
     where: { publicId, status: TestimonyStatus.approved },
@@ -168,8 +178,8 @@ export async function getLockedArchiveEntries(filters: {
 
   if (filters.month) {
     const month = Number(filters.month);
-    const start = new Date(2026, month - 1, 1);
-    const end = new Date(2026, month, 0);
+    const start = new Date(Date.UTC(2026, month - 1, 1));
+    const end = new Date(Date.UTC(2026, month, 0));
     where.testimony = {
       ...(where.testimony as object),
       occurredOn: { gte: start, lte: end },
@@ -193,4 +203,94 @@ export async function getLockedBySlug(slug: string) {
       testimony: { include: { category: true } },
     },
   });
+}
+
+export async function getGraceOfTheDay() {
+  const featured = await prisma.testimony.findFirst({
+    where: {
+      status: TestimonyStatus.approved,
+      isFeatured: true,
+    },
+    include: {
+      category: true,
+      lockedArchive: true,
+    },
+    orderBy: [{ featuredOn: "desc" }, { createdAt: "desc" }],
+  });
+
+  if (featured) return featured;
+
+  return prisma.testimony.findFirst({
+    where: { status: TestimonyStatus.approved },
+    include: {
+      category: true,
+      lockedArchive: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function getDiscoverTestimonies(filters: {
+  month?: string;
+  categoryId?: string;
+  location?: string;
+  page?: number;
+}) {
+  const page = Math.max(1, filters.page ?? 1);
+  const take = 24;
+  const where: Record<string, unknown> = {
+    status: TestimonyStatus.approved,
+  };
+
+  if (filters.categoryId) where.categoryId = filters.categoryId;
+  if (filters.location) {
+    where.location = { contains: filters.location, mode: "insensitive" };
+  }
+  if (filters.month) {
+    const month = Number(filters.month);
+    where.occurredOn = {
+      gte: new Date(Date.UTC(2026, month - 1, 1)),
+      lte: new Date(Date.UTC(2026, month, 0)),
+    };
+  }
+
+  const [items, total] = await Promise.all([
+    prisma.testimony.findMany({
+      where,
+      include: { category: true, lockedArchive: true },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * take,
+      take,
+    }),
+    prisma.testimony.count({ where }),
+  ]);
+
+  return { items, total, page, take };
+}
+
+export async function getTestimoniesForDayPaged(
+  dateKey: string,
+  page = 1,
+) {
+  const date = parseDateParam(dateKey);
+  if (!date) return { items: [], total: 0, page: 1, take: 24 };
+
+  const take = 24;
+  const where = {
+    occurredOn: date,
+    status: TestimonyStatus.approved,
+  };
+
+  const [items, total] = await Promise.all([
+    prisma.testimony.findMany({
+      where,
+      include: { category: true, lockedArchive: true },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * take,
+      take,
+    }),
+    prisma.testimony.count({ where }),
+  ]);
+
+  return { items, total, page, take };
 }

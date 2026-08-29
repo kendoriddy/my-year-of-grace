@@ -86,5 +86,5 @@ export function buildPaystackReference(testimonyId: string) {
 }
 
 export function buildLockCallbackUrl(publicId: string) {
-  return `${APP_URL}/lock/${publicId}/success`;
+  return `${APP_URL}/preserve/${publicId}/success`;
 }

@@ -32,7 +32,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
                 href="/admin/archive"
                 className="block rounded-lg px-3 py-2 hover:bg-zinc-100"
               >
-                Locked Archive
+                Grace Archive
               </Link>
               <Link
                 href="/admin/settings"

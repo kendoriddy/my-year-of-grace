@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       m.getApprovedTestimony(body.publicId!),
     );
     if (!testimony?.isLocked) {
-      return NextResponse.json({ error: "Testimony is not locked." }, { status: 400 });
+      return NextResponse.json({ error: "Testimony is not preserved." }, { status: 400 });
     }
 
     const tokens = await import("@/lib/auth").then((m) =>

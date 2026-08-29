@@ -84,7 +84,7 @@ export default async function AdminSettingsPage({
       <Card className="mt-8">
         <form action={saveSettingsAction} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="lockPriceKobo">Lock price (kobo)</Label>
+            <Label htmlFor="lockPriceKobo">Preserve price (kobo)</Label>
             <Input id="lockPriceKobo" name="lockPriceKobo" defaultValue={settings.lockPriceKobo} />
           </div>
           <div className="space-y-2">

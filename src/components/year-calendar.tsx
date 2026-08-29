@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 type DayCount = { total: number; locked: number };
@@ -13,6 +12,20 @@ type CalendarProps = {
 };
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 export function YearCalendar({ counts, initialMonth = 1 }: CalendarProps) {
   const [month, setMonth] = useState(initialMonth);
@@ -29,7 +42,7 @@ export function YearCalendar({ counts, initialMonth = 1 }: CalendarProps) {
       cells.push({ date, day });
     }
 
-    return { days: cells, monthLabel: format(first, "MMMM yyyy") };
+    return { days: cells, monthLabel: `${MONTHS[month - 1]} 2026` };
   }, [month]);
 
   return (
@@ -73,11 +86,20 @@ export function YearCalendar({ counts, initialMonth = 1 }: CalendarProps) {
           ))}
           {days.map((cell, index) => {
             if (!cell.date || !cell.day) {
-              return <div key={`empty-${index}`} className="min-h-16 md:min-h-24" />;
+              return (
+                <div key={`empty-${index}`} className="min-h-16 md:min-h-24" />
+              );
             }
 
             const data = counts[cell.date] ?? { total: 0, locked: 0 };
-            const hasActivity = data.total > 0;
+            const richness =
+              data.total >= 30
+                ? "bg-terracotta/20 border-terracotta/25"
+                : data.total >= 12
+                  ? "bg-terracotta/12 border-terracotta/20"
+                  : data.total >= 1
+                    ? "bg-paper border-ink/8"
+                    : "";
 
             return (
               <Link
@@ -85,13 +107,18 @@ export function YearCalendar({ counts, initialMonth = 1 }: CalendarProps) {
                 href={`/day/${cell.date}`}
                 className={cn(
                   "group min-h-16 rounded-xl border border-transparent p-2 transition hover:border-terracotta/20 hover:bg-terracotta/5 md:min-h-24 md:p-3",
-                  hasActivity && "border-ink/8 bg-paper",
+                  richness,
                 )}
               >
                 <div className="flex items-start justify-between">
-                  <span className="text-sm font-semibold text-ink">{cell.day}</span>
+                  <span className="text-sm font-semibold text-ink">
+                    {cell.day}
+                  </span>
                   {data.locked > 0 && (
-                    <span className="text-xs text-ember" title="Locked testimonies">
+                    <span
+                      className="text-xs text-ember"
+                      title="Preserved testimonies"
+                    >
                       🔒
                     </span>
                   )}
@@ -101,7 +128,9 @@ export function YearCalendar({ counts, initialMonth = 1 }: CalendarProps) {
                     {data.total} testimon{data.total === 1 ? "y" : "ies"}
                   </p>
                   {data.locked > 0 && (
-                    <p className="text-xs text-ember">{data.locked} locked</p>
+                    <p className="text-xs text-ember">
+                      {data.locked} preserved
+                    </p>
                   )}
                 </div>
                 <div className="mt-2 flex gap-1 md:hidden">

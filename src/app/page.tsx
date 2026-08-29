@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { EmberSection } from "@/components/ember-section";
+import { GraceOfTheDay } from "@/components/grace-of-the-day";
 import { LiveStats } from "@/components/live-stats";
 import { TestimonyCard } from "@/components/testimony-card";
 import { YearCalendar } from "@/components/year-calendar";
 import { Button } from "@/components/ui/button";
-import { getArchiveStats, getCalendarCounts } from "@/lib/stats";
+import { getArchiveStats, getYearCalendarCounts } from "@/lib/stats";
 import { getRecentTestimonies } from "@/lib/testimonies";
 import { getLockPriceKobo, getSetting } from "@/lib/settings";
 import { nowInLagos } from "@/lib/timezone";
@@ -14,14 +16,13 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const currentMonth = nowInLagos().getMonth() + 1;
-  const [countsMap, recent, archiveStats, priceKobo, announcement, subtitle] =
+  const [countsMap, recent, archiveStats, priceKobo, announcement] =
     await Promise.all([
-      getCalendarCounts(currentMonth),
+      getYearCalendarCounts(),
       getRecentTestimonies(6),
       getArchiveStats(),
       getLockPriceKobo(),
       getSetting("homepageAnnouncement"),
-      getSetting("homepageHeroSubtitle"),
     ]);
 
   const counts = Object.fromEntries(countsMap.entries());
@@ -38,24 +39,30 @@ export default async function HomePage() {
             MY YEAR OF GRACE
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-ink/70 md:text-xl">
-            {subtitle}
+            Before the year ends, tell us what God has done.
           </p>
-          <p className="mx-auto mt-4 max-w-2xl text-sm text-ink/60">
-            2026 isn&apos;t over yet. Maybe you got the job you prayed for. Maybe you
-            survived something. Maybe God answered a prayer. What are you grateful for?
-          </p>
+          <div className="mx-auto mt-8 max-w-xl space-y-2 text-ink/60">
+            <p>The answered prayers.</p>
+            <p>The unexpected blessings.</p>
+            <p>The protection.</p>
+            <p>The people you met.</p>
+            <p>The doors that opened.</p>
+            <p>The moments you thought would never happen.</p>
+            <p className="pt-2 font-medium text-ink">What are you grateful for?</p>
+          </div>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild size="lg">
-              <Link href="/share">🙏 Tell My Testimony</Link>
+              <Link href="/share">Tell My Testimony</Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
-              <Link href="#calendar">📅 Explore 2026</Link>
+              <Link href="#calendar">Explore 2026</Link>
             </Button>
           </div>
         </div>
       </section>
 
       <LiveStats />
+      <GraceOfTheDay />
 
       <Suspense fallback={<div className="py-16 text-center">Loading calendar...</div>}>
         <YearCalendar counts={counts} initialMonth={currentMonth} />
@@ -74,24 +81,34 @@ export default async function HomePage() {
         </section>
       )}
 
+      <EmberSection />
+
       <section className="py-16">
         <div className="mx-auto max-w-3xl rounded-3xl border border-ember/20 bg-ember/5 px-6 py-10 text-center">
-          <p className="text-sm uppercase tracking-wide text-ember">Grace Archive</p>
+          <p className="text-sm uppercase tracking-wide text-ember">2026 Grace Archive</p>
           <h2 className="mt-3 font-serif text-3xl text-ink">
-            {archiveStats.claimed.toLocaleString()} / {archiveStats.capacity.toLocaleString()}
+            {archiveStats.isFull
+              ? "The 2026 Grace Archive is now full."
+              : `${archiveStats.claimed.toLocaleString()} / ${archiveStats.capacity.toLocaleString()} preserved`}
           </h2>
-          <p className="mt-2 text-ink/70">Grace places claimed</p>
+          {!archiveStats.isFull && (
+            <p className="mt-2 text-sm text-ink/60">
+              {archiveStats.remaining.toLocaleString()} preserved places remaining.
+            </p>
+          )}
+          <p className="mt-6 text-ink/70">
+            Your testimony deserves its own place on the internet.
+          </p>
           <p className="mt-2 text-sm text-ink/60">
-            {archiveStats.remaining.toLocaleString()} places still available.
+            Some moments are too important to leave behind.
           </p>
-          <p className="mt-6 text-sm text-ink/60">
-            Lock your testimony into the 2026 Grace Archive. Only 10,000 places available.
-          </p>
-          <Button asChild variant="ember" className="mt-6">
-            <Link href="/share">
-              Lock Your Testimony — {formatNaira(priceKobo)}
-            </Link>
-          </Button>
+          {!archiveStats.isFull && (
+            <Button asChild variant="ember" className="mt-6">
+              <Link href="/share">
+                Preserve it forever — {formatNaira(priceKobo)}
+              </Link>
+            </Button>
+          )}
         </div>
       </section>
 

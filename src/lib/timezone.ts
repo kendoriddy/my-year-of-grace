@@ -5,7 +5,6 @@ import {
   isAfter,
   isBefore,
   isValid,
-  parseISO,
   startOfDay,
 } from "date-fns";
 import { LAGOS_TZ, YEAR_END, YEAR_START } from "@/lib/constants";
@@ -15,19 +14,47 @@ export function nowInLagos(): Date {
 }
 
 export function formatLagosDate(date: Date | string, pattern = "MMMM d, yyyy") {
-  const d = typeof date === "string" ? parseISO(date) : date;
-  const dateOnly = new Date(
-    d.getUTCFullYear(),
-    d.getUTCMonth(),
-    d.getUTCDate(),
-  );
-  return format(dateOnly, pattern);
+  const utc = toUtcDate(date);
+  if (!utc) return "";
+  return formatInTimeZone(utc, "UTC", pattern);
 }
 
 export function parseDateParam(value: string): Date | null {
-  const parsed = parseISO(value);
-  if (!isValid(parsed)) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (!match) return null;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
   return parsed;
+}
+
+export function toUtcDate(date: Date | string): Date | null {
+  if (typeof date === "string") {
+    const key = date.slice(0, 10);
+    return parseDateParam(key);
+  }
+
+  if (!isValid(date)) return null;
+  return new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+  );
+}
+
+export function toUtcDateKey(date: Date | string): string {
+  const utc = toUtcDate(date);
+  if (!utc) return "";
+  return formatInTimeZone(utc, "UTC", "yyyy-MM-dd");
 }
 
 export function isDateIn2026(date: Date): boolean {

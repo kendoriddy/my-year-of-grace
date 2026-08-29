@@ -27,6 +27,23 @@ async function updateStatusAction(formData: FormData) {
   redirect("/admin/testimonies");
 }
 
+async function featureAction(formData: FormData) {
+  "use server";
+  const session = await getAdminSession();
+  if (!session) redirect("/admin/login");
+
+  const id = String(formData.get("id") || "");
+  const featured = String(formData.get("featured") || "") === "1";
+  await prisma.testimony.update({
+    where: { id },
+    data: {
+      isFeatured: featured,
+      featuredOn: featured ? new Date() : null,
+    },
+  });
+  redirect("/admin/testimonies");
+}
+
 export default async function AdminTestimoniesPage({
   searchParams,
 }: PageProps<"/admin/testimonies">) {
@@ -85,6 +102,7 @@ export default async function AdminTestimoniesPage({
               <div>
                 <p className="text-xs uppercase tracking-wide text-zinc-500">
                   {testimony.status} · {formatLagosDate(testimony.occurredOn)}
+                  {testimony.isFeatured ? " · featured" : ""}
                 </p>
                 <p className="mt-2 font-medium text-ink">
                   {testimony.category.emoji} {truncate(testimony.content, 160)}
@@ -108,6 +126,17 @@ export default async function AdminTestimoniesPage({
                     </form>
                   ),
                 )}
+                <form action={featureAction}>
+                  <input type="hidden" name="id" value={testimony.id} />
+                  <input
+                    type="hidden"
+                    name="featured"
+                    value={testimony.isFeatured ? "0" : "1"}
+                  />
+                  <Button type="submit" size="sm" variant="ember">
+                    {testimony.isFeatured ? "Unfeature" : "Feature"}
+                  </Button>
+                </form>
               </div>
             </div>
           </Card>

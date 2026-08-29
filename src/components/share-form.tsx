@@ -25,6 +25,8 @@ export function ShareForm({ categories, defaultDate }: ShareFormProps) {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,7 +44,7 @@ export function ShareForm({ categories, defaultDate }: ShareFormProps) {
       displayName: String(formData.get("displayName") || ""),
       location: String(formData.get("location") || ""),
       email: String(formData.get("email") || ""),
-      imageUrl: String(formData.get("imageUrl") || ""),
+      imageUrl: imageUrl || String(formData.get("imageUrl") || ""),
       isAnonymous: formData.get("visibility") === "anonymous",
       ref: searchParams.get("ref") || undefined,
     };
@@ -63,7 +65,7 @@ export function ShareForm({ categories, defaultDate }: ShareFormProps) {
       }
 
       trackEvent("testimony_complete", { publicId: data.publicId || "" });
-      router.push(`/t/${data.publicId}?submitted=1`);
+      router.push(`/preserve/${data.publicId}?submitted=1`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -139,13 +141,44 @@ export function ShareForm({ categories, defaultDate }: ShareFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="imageUrl">Photo URL (optional)</Label>
+          <Label htmlFor="photo">Photo (optional)</Label>
           <Input
-            id="imageUrl"
-            name="imageUrl"
-            type="url"
-            placeholder="https://..."
+            id="photo"
+            type="file"
+            accept="image/*"
+            onChange={async (event) => {
+              const file = event.target.files?.[0];
+              if (!file) return;
+              setUploading(true);
+              setError(null);
+              try {
+                const upload = new FormData();
+                upload.set("file", file);
+                const response = await fetch("/api/upload", {
+                  method: "POST",
+                  body: upload,
+                });
+                const data = (await response.json()) as {
+                  url?: string;
+                  error?: string;
+                };
+                if (!response.ok || !data.url) {
+                  throw new Error(data.error || "Upload failed.");
+                }
+                setImageUrl(data.url);
+              } catch (err) {
+                setError(
+                  err instanceof Error ? err.message : "Photo upload failed.",
+                );
+              } finally {
+                setUploading(false);
+              }
+            }}
           />
+          {uploading && <p className="text-xs text-ink/50">Uploading photo…</p>}
+          {imageUrl && (
+            <p className="text-xs text-emerald-800">Photo added.</p>
+          )}
         </div>
 
         <fieldset className="space-y-3">

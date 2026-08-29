@@ -11,6 +11,12 @@ export function SiteFooter() {
           </p>
         </div>
         <div className="flex gap-6 text-sm text-ink/60">
+          <Link href="/stories" className="hover:text-ink">
+            Stories
+          </Link>
+          <Link href="/archive" className="hover:text-ink">
+            Archive
+          </Link>
           <Link href="/about" className="hover:text-ink">
             About
           </Link>

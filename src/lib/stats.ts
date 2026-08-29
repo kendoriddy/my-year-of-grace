@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { TestimonyStatus } from "@/generated/prisma/client";
 import { getArchiveCapacity } from "@/lib/settings";
-import { getDaysOfGrace } from "@/lib/timezone";
+import { getDaysOfGrace, toUtcDateKey } from "@/lib/timezone";
 
 export async function getPublicStats() {
   const [totalTestimonies, lockedCount, uniquePeople] = await Promise.all([
@@ -35,9 +35,9 @@ export async function getArchiveStats() {
   };
 }
 
-export async function getCalendarCounts(month: number) {
-  const start = new Date(2026, month - 1, 1);
-  const end = new Date(2026, month, 0);
+export async function getYearCalendarCounts() {
+  const start = new Date(Date.UTC(2026, 0, 1));
+  const end = new Date(Date.UTC(2026, 11, 31));
 
   const rows = await prisma.$queryRaw<
     Array<{ day: Date; total: bigint; locked: bigint }>
@@ -56,7 +56,37 @@ export async function getCalendarCounts(month: number) {
 
   const map = new Map<string, { total: number; locked: number }>();
   for (const row of rows) {
-    const key = row.day.toISOString().slice(0, 10);
+    const key = toUtcDateKey(row.day);
+    map.set(key, {
+      total: Number(row.total),
+      locked: Number(row.locked),
+    });
+  }
+  return map;
+}
+
+export async function getCalendarCounts(month: number) {
+  const start = new Date(Date.UTC(2026, month - 1, 1));
+  const end = new Date(Date.UTC(2026, month, 0));
+
+  const rows = await prisma.$queryRaw<
+    Array<{ day: Date; total: bigint; locked: bigint }>
+  >`
+    SELECT
+      t."occurredOn" AS day,
+      COUNT(*)::bigint AS total,
+      COUNT(*) FILTER (WHERE t."isLocked" = true)::bigint AS locked
+    FROM "Testimony" t
+    WHERE t.status = 'approved'
+      AND t."occurredOn" >= ${start}
+      AND t."occurredOn" <= ${end}
+    GROUP BY t."occurredOn"
+    ORDER BY t."occurredOn"
+  `;
+
+  const map = new Map<string, { total: number; locked: number }>();
+  for (const row of rows) {
+    const key = toUtcDateKey(row.day);
     map.set(key, {
       total: Number(row.total),
       locked: Number(row.locked),

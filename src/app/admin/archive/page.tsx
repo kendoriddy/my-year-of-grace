@@ -55,7 +55,7 @@ export default async function AdminArchivePage({
 
   return (
     <div>
-      <h1 className="font-serif text-3xl text-ink">Locked Archive</h1>
+      <h1 className="font-serif text-3xl text-ink">Grace Archive</h1>
       <form className="mt-6 flex gap-3">
         <Input name="q" placeholder="Search archive" defaultValue={q} />
         <Button type="submit">Search</Button>
@@ -69,7 +69,8 @@ export default async function AdminArchivePage({
                 <p className="text-sm text-ember">{formatGraceNumber(entry.archiveNumber)}</p>
                 <p className="mt-2 text-ink">{truncate(entry.testimony.content, 180)}</p>
                 <p className="mt-2 text-sm text-zinc-500">
-                  {formatLagosDate(entry.testimony.occurredOn)} · {entry.payment.status}
+                  {formatLagosDate(entry.testimony.occurredOn)} · {entry.payment.status} ·{" "}
+                  {entry.themeId} · gift {entry.giftEligible ? "eligible" : "no"}
                 </p>
                 <Link href={`/${entry.customSlug}`} className="mt-2 inline-block text-sm underline">
                   /{entry.customSlug}

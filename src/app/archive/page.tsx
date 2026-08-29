@@ -35,13 +35,16 @@ export default async function ArchivePage({
       <div className="max-w-3xl">
         <p className="text-sm uppercase tracking-wide text-ember">🔒 The 2026 Grace Archive</p>
         <h1 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
-          10,000 permanent places.
+          10,000 people.
         </h1>
+        <p className="mt-2 font-serif text-3xl text-ink/80">
+          10,000 moments worth remembering.
+        </p>
         <p className="mt-4 text-lg text-ink/70">
-          These are the testimonies people chose to preserve forever.
+          These are the stories people chose to preserve from 2026.
         </p>
         <p className="mt-4 text-sm text-ink/60">
-          {stats.claimed.toLocaleString()} / {stats.capacity.toLocaleString()} Grace places claimed
+          {stats.claimed.toLocaleString()} / {stats.capacity.toLocaleString()} preserved
         </p>
       </div>
 
@@ -86,6 +89,7 @@ export default async function ArchivePage({
               lockedArchive: {
                 archiveNumber: entry.archiveNumber,
                 customSlug: entry.customSlug,
+                themeId: entry.themeId,
               },
             }}
           />
@@ -94,7 +98,7 @@ export default async function ArchivePage({
 
       {entries.length === 0 && (
         <div className="mt-10 rounded-2xl border border-dashed border-ink/10 p-10 text-center text-ink/60">
-          No locked testimonies match your filters yet.
+          No preserved testimonies match your filters yet.
         </div>
       )}
 

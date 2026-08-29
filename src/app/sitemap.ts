@@ -28,6 +28,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `https://${CANONICAL_DOMAIN}/archive`,
       lastModified: new Date(),
     },
+    {
+      url: `https://${CANONICAL_DOMAIN}/stories`,
+      lastModified: new Date(),
+    },
     ...testimonies.map((item) => ({
       url: `https://${CANONICAL_DOMAIN}/t/${item.publicId}`,
       lastModified: item.updatedAt,

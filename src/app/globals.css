@@ -29,3 +29,85 @@ body {
 .font-serif {
   font-family: var(--font-instrument-serif), Georgia, serif;
 }
+
+.keepsake {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--k-text);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--k-glow), transparent 58%),
+    linear-gradient(180deg, var(--k-bg) 0%, var(--k-bg-alt) 100%);
+}
+
+.keepsake-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 18% 10% auto;
+  height: 42%;
+  border-radius: 999px;
+  background: var(--k-glow);
+  filter: blur(80px);
+  opacity: 0.7;
+  animation: keepsake-breathe 8s ease-in-out infinite;
+}
+
+.keepsake-particle {
+  pointer-events: none;
+  position: absolute;
+  border-radius: 999px;
+  background: var(--k-particle);
+  animation: keepsake-float 14s ease-in-out infinite;
+}
+
+.keepsake-reveal {
+  animation: keepsake-reveal 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes keepsake-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes keepsake-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate3d(8px, -18px, 0);
+    opacity: 0.8;
+  }
+}
+
+@keyframes keepsake-breathe {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keepsake-reveal,
+  .keepsake-particle,
+  .keepsake-glow {
+    animation: none;
+  }
+}
+
+body[data-keepsake="true"] header,
+body[data-keepsake="true"] footer {
+  display: none;
+}

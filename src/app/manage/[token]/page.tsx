@@ -47,5 +47,5 @@ export default async function ManagePage({ params }: PageProps<"/manage/[token]"
     redirect(`/${matched.lockedArchive.customSlug}`);
   }
 
-  redirect(`/t/${matched.publicId}`);
+  redirect(`/preserve/${matched.publicId}`);
 }

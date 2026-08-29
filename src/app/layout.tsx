@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import { Instrument_Serif } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
+import { ChromeVisibility } from "@/components/site-chrome";
 import { Suspense } from "react";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { ReferralTracker } from "@/components/referral-tracker";
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Suspense fallback={null}>
             <ReferralTracker />
           </Suspense>
+          <ChromeVisibility />
           <SiteNav />
           <main className="flex-1">{children}</main>
           <SiteFooter />

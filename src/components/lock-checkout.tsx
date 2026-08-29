@@ -57,13 +57,12 @@ export function LockCheckout({
 
   return (
     <div className="rounded-2xl border border-ember/20 bg-ember/5 p-6">
-      <p className="text-sm uppercase tracking-wide text-ember">Lock Your Testimony</p>
+      <p className="text-sm uppercase tracking-wide text-ember">Preserve Your Testimony</p>
       <h2 className="mt-2 font-serif text-2xl text-ink">
-        Preserve this memory in the 2026 Grace Archive
+        Your testimony deserves its own place on the internet.
       </h2>
       <p className="mt-3 text-sm text-ink/70">
-        There are {remaining.toLocaleString()} / {capacity.toLocaleString()} Grace Archive
-        places remaining.
+        {remaining.toLocaleString()} / {capacity.toLocaleString()} preserved places remaining.
       </p>
       <p className="mt-4 text-3xl font-semibold text-ink">{formatNaira(priceKobo)}</p>
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
@@ -77,7 +76,7 @@ export function LockCheckout({
           ? "Archive Full"
           : loading
             ? "Redirecting..."
-            : `Lock My Testimony — ${formatNaira(priceKobo)}`}
+            : `Preserve my testimony — ${formatNaira(priceKobo)}`}
       </Button>
     </div>
   );

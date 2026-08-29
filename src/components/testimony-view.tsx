@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { ShareButtons } from "@/components/share-buttons";
 import { ShareCard } from "@/components/share-card";
-import { LockCheckout } from "@/components/lock-checkout";
 import { Button } from "@/components/ui/button";
 import { formatLagosDate } from "@/lib/timezone";
-import { formatGraceNumber } from "@/lib/utils";
+import { formatGraceNumber, formatNaira } from "@/lib/utils";
 import { getArchiveStats } from "@/lib/stats";
 import { getLockPriceKobo } from "@/lib/settings";
 import { canManageTestimony } from "@/lib/auth";
@@ -24,6 +23,7 @@ type TestimonyViewProps = {
     lockedArchive?: {
       archiveNumber: number;
       customSlug: string;
+      themeId?: string | null;
     } | null;
   };
   showLockCta?: boolean;
@@ -54,7 +54,7 @@ export async function TestimonyView({
     <article className="mx-auto max-w-3xl px-4 py-16">
       {submitted && (
         <p className="mb-6 rounded-full bg-terracotta/10 px-4 py-2 text-center text-sm text-terracotta">
-          Your testimony is now part of the 2026 Year of Grace. 🙏
+          Your testimony has been added.
         </p>
       )}
 
@@ -78,22 +78,18 @@ export async function TestimonyView({
       <p className="mt-6 text-lg text-ink/80">
         — {author}
         {testimony.location ? `, ${testimony.location}` : ""}
-        {testimony.location?.toLowerCase().includes("nigeria") ||
-        ["lagos", "ibadan", "abuja", "port harcourt"].some((city) =>
-          testimony.location?.toLowerCase().includes(city),
-        )
-          ? " 🇳🇬"
-          : ""}
       </p>
 
       {locked && (
-        <p className="mt-4 text-sm text-ember">
-          🔒 Locked into the 2026 Grace Archive
-        </p>
+        <p className="mt-4 text-sm text-ember">Preserved in the 2026 Grace Archive</p>
       )}
 
       <div className="mt-10 space-y-6">
-        <ShareCard publicId={testimony.publicId} locked={locked} />
+        <ShareCard
+          publicId={testimony.publicId}
+          locked={locked}
+          themeId={testimony.lockedArchive?.themeId}
+        />
         <ShareButtons
           publicId={testimony.publicId}
           content={testimony.content}
@@ -104,20 +100,31 @@ export async function TestimonyView({
       </div>
 
       {!locked && showLockCta && canManage && !archiveStats.isFull && (
-        <div className="mt-12">
-          <LockCheckout
-            publicId={testimony.publicId}
-            priceKobo={priceKobo}
-            remaining={archiveStats.remaining}
-            capacity={archiveStats.capacity}
-            email={testimony.email}
-          />
+        <div className="mt-12 rounded-[2rem] border border-ember/20 bg-ember/5 p-6 text-center md:p-8">
+          <p className="text-xs uppercase tracking-[0.2em] text-ember">
+            Preserve it forever
+          </p>
+          <h2 className="mt-3 font-serif text-2xl text-ink">
+            Your testimony deserves its own place on the internet.
+          </h2>
+          <p className="mt-3 text-sm text-ink/65">
+            Preview your custom page, then preserve it in the 2026 Grace Archive
+            for {formatNaira(priceKobo)}.
+          </p>
+          <p className="mt-2 text-xs text-ink/50">
+            {archiveStats.remaining.toLocaleString()} places remaining
+          </p>
+          <Button asChild variant="ember" className="mt-6">
+            <Link href={`/preserve/${testimony.publicId}`}>
+              Preserve my testimony — {formatNaira(priceKobo)}
+            </Link>
+          </Button>
         </div>
       )}
 
-      <div className="mt-12">
+      <div className="mt-12 flex flex-wrap gap-3">
         <Button asChild variant="secondary">
-          <Link href="/share">🙏 Share Your Own Testimony</Link>
+          <Link href="/share">Tell your own story</Link>
         </Button>
       </div>
     </article>

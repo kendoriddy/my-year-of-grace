@@ -12,6 +12,8 @@ export async function POST(request: Request) {
     const body = (await request.json()) as {
       publicId?: string;
       email?: string;
+      slug?: string;
+      themeId?: string;
     };
 
     if (!body.publicId) {
@@ -28,17 +30,36 @@ export async function POST(request: Request) {
     }
 
     if (testimony.isLocked) {
-      return NextResponse.json({ error: "Already locked." }, { status: 400 });
+      return NextResponse.json({ error: "Already preserved." }, { status: 400 });
     }
 
-    const payment = await createPendingLockPayment(testimony.id, body.email);
+    const email = body.email || testimony.email;
+    if (!email) {
+      return NextResponse.json(
+        { error: "An email is needed so we can keep your preserved page safe." },
+        { status: 400 },
+      );
+    }
+
+    if (body.slug || body.themeId) {
+      const { savePreservationIntent } = await import("@/lib/lock");
+      await savePreservationIntent({
+        testimonyId: testimony.id,
+        preferredSlug: (body.slug || testimony.preferredSlug || "").toLowerCase(),
+        themeId: body.themeId || testimony.themeId,
+      }).catch(() => undefined);
+    }
+
+    const payment = await createPendingLockPayment(testimony.id, email);
     const initialized = await initializePaystackPayment({
-      email: body.email || testimony.email || undefined,
+      email,
       amount: payment.amount,
       reference: payment.reference,
       metadata: {
         testimonyId: testimony.id,
         testimonyPublicId: testimony.publicId,
+        preferredSlug: body.slug || testimony.preferredSlug || "",
+        themeId: body.themeId || testimony.themeId,
       },
       callbackUrl: buildLockCallbackUrl(testimony.publicId),
     });

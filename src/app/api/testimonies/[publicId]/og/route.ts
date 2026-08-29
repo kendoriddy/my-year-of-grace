@@ -19,6 +19,9 @@ export async function GET(
     content: testimony.content,
     occurredOn: testimony.occurredOn.toISOString(),
     archiveNumber: testimony.lockedArchive?.archiveNumber ?? null,
-    customSlug: testimony.lockedArchive?.customSlug ?? null,
+    customSlug: testimony.lockedArchive?.customSlug ?? testimony.preferredSlug ?? null,
+    themeId: testimony.lockedArchive?.themeId ?? testimony.themeId,
+    displayName: testimony.isAnonymous ? "Anonymous" : testimony.displayName || "Anonymous",
+    location: testimony.location,
   });
 }
