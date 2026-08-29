@@ -8,22 +8,19 @@ import { YearCalendar } from "@/components/year-calendar";
 import { Button } from "@/components/ui/button";
 import { getArchiveStats, getYearCalendarCounts } from "@/lib/stats";
 import { getRecentTestimonies } from "@/lib/testimonies";
-import { getLockPriceKobo, getSetting } from "@/lib/settings";
+import { getSetting } from "@/lib/settings";
 import { nowInLagos } from "@/lib/timezone";
-import { formatNaira } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const currentMonth = nowInLagos().getMonth() + 1;
-  const [countsMap, recent, archiveStats, priceKobo, announcement] =
-    await Promise.all([
-      getYearCalendarCounts(),
-      getRecentTestimonies(6),
-      getArchiveStats(),
-      getLockPriceKobo(),
-      getSetting("homepageAnnouncement"),
-    ]);
+  const [countsMap, recent, archiveStats, announcement] = await Promise.all([
+    getYearCalendarCounts(),
+    getRecentTestimonies(6),
+    getArchiveStats(),
+    getSetting("homepageAnnouncement"),
+  ]);
 
   const counts = Object.fromEntries(countsMap.entries());
 
@@ -48,7 +45,9 @@ export default async function HomePage() {
             <p>The people you met.</p>
             <p>The doors that opened.</p>
             <p>The moments you thought would never happen.</p>
-            <p className="pt-2 font-medium text-ink">What are you grateful for?</p>
+            <p className="pt-2 font-medium text-ink">
+              What are you grateful for?
+            </p>
           </div>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild size="lg">
@@ -64,7 +63,9 @@ export default async function HomePage() {
       <LiveStats />
       <GraceOfTheDay />
 
-      <Suspense fallback={<div className="py-16 text-center">Loading calendar...</div>}>
+      <Suspense
+        fallback={<div className="py-16 text-center">Loading calendar...</div>}
+      >
         <YearCalendar counts={counts} initialMonth={currentMonth} />
       </Suspense>
 
@@ -85,7 +86,9 @@ export default async function HomePage() {
 
       <section className="py-16">
         <div className="mx-auto max-w-3xl rounded-3xl border border-ember/20 bg-ember/5 px-6 py-10 text-center">
-          <p className="text-sm uppercase tracking-wide text-ember">2026 Grace Archive</p>
+          <p className="text-sm uppercase tracking-wide text-ember">
+            2026 Grace Archive
+          </p>
           <h2 className="mt-3 font-serif text-3xl text-ink">
             {archiveStats.isFull
               ? "The 2026 Grace Archive is now full."
@@ -93,7 +96,8 @@ export default async function HomePage() {
           </h2>
           {!archiveStats.isFull && (
             <p className="mt-2 text-sm text-ink/60">
-              {archiveStats.remaining.toLocaleString()} preserved places remaining.
+              {archiveStats.remaining.toLocaleString()} preserved places
+              remaining.
             </p>
           )}
           <p className="mt-6 text-ink/70">
@@ -104,16 +108,16 @@ export default async function HomePage() {
           </p>
           {!archiveStats.isFull && (
             <Button asChild variant="ember" className="mt-6">
-              <Link href="/share">
-                Preserve it forever — {formatNaira(priceKobo)}
-              </Link>
+              <Link href="/share">Preserve it forever</Link>
             </Button>
           )}
         </div>
       </section>
 
       <section className="px-4 pb-20 pt-8 text-center">
-        <h2 className="font-serif text-3xl text-ink">Tell your story. It&apos;s free.</h2>
+        <h2 className="font-serif text-3xl text-ink">
+          Tell your story. It&apos;s free.
+        </h2>
         <Button asChild className="mt-6">
           <Link href="/share">Share Your Testimony</Link>
         </Button>
