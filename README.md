@@ -40,19 +40,16 @@ Supabase’s **direct** host (`db.[ref].supabase.co:5432`) is **IPv6-only**. Man
 | Vercel / production app | **Transaction pooler** | 6543               | `postgres.[project-ref]` |
 | Local `db push` / seed  | **Session pooler**     | 5432 (pooler host) | `postgres.[project-ref]` |
 
-Always include `?sslmode=require` (never `sslmode=disable`).
-
-**Vercel env example:**
+Use **two env vars** in local `.env`:
 
 ```
+DIRECT_DATABASE_URL=postgresql://postgres.[ref]:[PASSWORD]@aws-0-[region].pooler.supabase.com:5432/postgres?sslmode=require
 DATABASE_URL=postgresql://postgres.[ref]:[PASSWORD]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require
 ```
 
-**Local `.env` for migrations** (Session pooler from dashboard):
+`prisma7.config.ts` uses `DIRECT_DATABASE_URL` for `db push`. **Do not run `db push` on port 6543** — it hangs.
 
-```
-DATABASE_URL=postgresql://postgres.[ref]:[PASSWORD]@aws-0-[region].pooler.supabase.com:5432/postgres?sslmode=require
-```
+**Vercel env:** set only `DATABASE_URL` (6543 transaction pooler).
 
 Also check in Supabase: **Project is not paused** (free tier pauses after inactivity → click **Restore**).
 
