@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,6 @@ type ShareFormProps = {
 };
 
 export function ShareForm({ categories, defaultDate }: ShareFormProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,9 +66,9 @@ export function ShareForm({ categories, defaultDate }: ShareFormProps) {
 
       trackEvent("testimony_complete", { publicId: data.publicId || "" });
       if (data.manageToken) {
-        router.push(`/manage/${data.manageToken}?submitted=1`);
+        window.location.assign(`/manage/${data.manageToken}?submitted=1`);
       } else {
-        router.push(`/preserve/${data.publicId}?submitted=1`);
+        window.location.assign(`/preserve/${data.publicId}?submitted=1`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");

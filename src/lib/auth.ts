@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { MANAGE_COOKIE } from "@/lib/constants";
 import { hashValue, verifyManageToken } from "@/lib/crypto";
@@ -17,6 +18,45 @@ export async function getManageTokensFromCookies(): Promise<ManageTokenMap> {
   } catch {
     return {};
   }
+}
+
+export async function setManageTokenCookie(publicId: string, manageToken: string) {
+  const cookieStore = await cookies();
+  const tokens = await getManageTokensFromCookies();
+  tokens[publicId] = manageToken;
+  cookieStore.set(MANAGE_COOKIE, JSON.stringify(tokens), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+  });
+}
+
+const MANAGE_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: 60 * 60 * 24 * 365,
+};
+
+export function attachManageTokenCookie(
+  response: NextResponse,
+  existingValue: string | undefined,
+  publicId: string,
+  manageToken: string,
+) {
+  let tokens: ManageTokenMap = {};
+  if (existingValue) {
+    try {
+      tokens = JSON.parse(existingValue) as ManageTokenMap;
+    } catch {
+      tokens = {};
+    }
+  }
+  tokens[publicId] = manageToken;
+  response.cookies.set(MANAGE_COOKIE, JSON.stringify(tokens), MANAGE_COOKIE_OPTIONS);
 }
 
 export async function canManageTestimony(

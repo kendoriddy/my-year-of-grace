@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { MANAGE_COOKIE } from "@/lib/constants";
-import {
-  checkRateLimit,
-  getClientIp,
-  recordRateLimit,
-} from "@/lib/abuse";
+import { setManageTokenCookie } from "@/lib/auth";
+import { checkRateLimit, getClientIp, recordRateLimit } from "@/lib/abuse";
 import { generateManageToken, hashManageToken } from "@/lib/crypto";
 import { prisma } from "@/lib/db";
 import { getApprovedTestimony } from "@/lib/testimonies";
@@ -51,20 +46,7 @@ export async function POST(request: Request) {
         where: { id: testimony.id },
         data: { manageTokenHash },
       });
-
-      const cookieStore = await cookies();
-      const existing = cookieStore.get(MANAGE_COOKIE)?.value;
-      const tokens = existing
-        ? (JSON.parse(existing) as Record<string, string>)
-        : {};
-      tokens[publicId] = manageToken;
-      cookieStore.set(MANAGE_COOKIE, JSON.stringify(tokens), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 365,
-      });
+      await setManageTokenCookie(publicId, manageToken);
     }
 
     return NextResponse.json({ ok: true });
