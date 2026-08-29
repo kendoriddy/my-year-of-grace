@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { KeepsakePage } from "@/components/keepsake-page";
+import { PreserveBenefits } from "@/components/preserve-benefits";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkle } from "lucide-react";
 import { PALETTES, PALETTE_IDS, type PaletteId } from "@/lib/palettes";
 import { formatNaira, previewGraceNumber, slugify } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
@@ -140,16 +140,6 @@ export function PreserveExperience({
       previewNumber,
     ],
   );
-
-  const benefits = [
-    "Permanent preservation in the 2026 Grace Archive",
-    `Custom public URL — myyearofgrace.com/${slug || "your-link"}`,
-    `Your selected ${PALETTES[themeId].label} visual theme`,
-    "An animated testimony page",
-    "A unique Grace Archive number",
-    "A personalized downloadable Grace Card",
-    "A special digital gift on December 31",
-  ];
 
   async function startPayment() {
     if (archiveFull) return;
@@ -320,18 +310,7 @@ export function PreserveExperience({
             Preserve this experience forever for {formatNaira(priceKobo)}.
           </p>
 
-          <ul className="mx-auto mt-8 max-w-md space-y-3 text-left text-sm text-ink/75">
-            {benefits.map((item) => (
-              <li key={item} className="flex items-start gap-3">
-                <Sparkle
-                  className="mt-0.5 size-4 shrink-0 text-ember"
-                  strokeWidth={1.6}
-                  aria-hidden
-                />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
+          <PreserveBenefits slug={slug} themeLabel={PALETTES[themeId].label} />
 
           <p className="mt-8 text-sm text-ink/60">
             Only 10,000 preserved places are available for 2026.

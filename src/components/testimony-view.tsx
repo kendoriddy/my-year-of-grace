@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { PreserveBenefits } from "@/components/preserve-benefits";
 import { ShareButtons } from "@/components/share-buttons";
 import { ShareCard } from "@/components/share-card";
 import { Button } from "@/components/ui/button";
 import { formatLagosDate } from "@/lib/timezone";
-import { formatGraceNumber, formatNaira } from "@/lib/utils";
+import { formatGraceNumber, formatNaira, slugify } from "@/lib/utils";
 import { getArchiveStats } from "@/lib/stats";
 import { getLockPriceKobo } from "@/lib/settings";
 import { canManageTestimony } from "@/lib/auth";
@@ -81,7 +82,19 @@ export async function TestimonyView({
       </p>
 
       {locked && (
-        <p className="mt-4 text-sm text-ember">Preserved in the 2026 Grace Archive</p>
+        <p className="mt-4 text-sm text-ember">
+          Preserved in the 2026 Grace Archive
+        </p>
+      )}
+
+      {!locked && showLockCta && !archiveStats.isFull && (
+        <div className="mt-8">
+          <Button asChild variant="ember" size="lg">
+            <Link href={`/preserve/${testimony.publicId}`}>
+              {canManage ? "Preserve it forever" : "Preserve it"}
+            </Link>
+          </Button>
+        </div>
       )}
 
       <div className="mt-10 space-y-6">
@@ -99,24 +112,36 @@ export async function TestimonyView({
         <p className="text-xs text-ink/40">{pageUrl}</p>
       </div>
 
-      {!locked && showLockCta && canManage && !archiveStats.isFull && (
+      {!locked && showLockCta && !archiveStats.isFull && (
         <div className="mt-12 rounded-[2rem] border border-ember/20 bg-ember/5 p-6 text-center md:p-8">
           <p className="text-xs uppercase tracking-[0.2em] text-ember">
-            Preserve it forever
+            {canManage ? "Preserve it forever" : "Is this your testimony?"}
           </p>
           <h2 className="mt-3 font-serif text-2xl text-ink">
-            Your testimony deserves its own place on the internet.
+            {canManage
+              ? "Your testimony deserves its own place on the internet."
+              : "Preserve it forever."}
           </h2>
           <p className="mt-3 text-sm text-ink/65">
-            Preview your custom page, then preserve it in the 2026 Grace Archive
-            for {formatNaira(priceKobo)}.
+            {canManage
+              ? `Preview your custom page, then preserve it in the 2026 Grace Archive for ${formatNaira(priceKobo)}.`
+              : "If this story is yours, give it a permanent home in the 2026 Grace Archive."}
           </p>
-          <p className="mt-2 text-xs text-ink/50">
+          <PreserveBenefits
+            slug={
+              testimony.isAnonymous
+                ? undefined
+                : slugify(testimony.displayName || "")
+            }
+          />
+          <p className="mt-8 text-xs text-ink/50">
             {archiveStats.remaining.toLocaleString()} places remaining
           </p>
           <Button asChild variant="ember" className="mt-6">
             <Link href={`/preserve/${testimony.publicId}`}>
-              Preserve my testimony — {formatNaira(priceKobo)}
+              {canManage
+                ? `Preserve my testimony — ${formatNaira(priceKobo)}`
+                : "Preserve it"}
             </Link>
           </Button>
         </div>
