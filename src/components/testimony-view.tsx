@@ -19,6 +19,7 @@ type TestimonyViewProps = {
     location: string | null;
     isAnonymous: boolean;
     email: string | null;
+    imageUrl?: string | null;
     isLocked: boolean;
     category: { emoji: string; name: string };
     lockedArchive?: {
@@ -71,6 +72,15 @@ export async function TestimonyView({
       <p className="mt-2 text-sm text-ink/60">
         {testimony.category.emoji} {testimony.category.name}
       </p>
+
+      {testimony.imageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={testimony.imageUrl}
+          alt="Photo attached to this testimony"
+          className="mt-8 w-full max-h-[28rem] rounded-3xl object-cover"
+        />
+      ) : null}
 
       <blockquote className="mt-8 font-serif text-3xl leading-relaxed text-ink md:text-4xl">
         “{testimony.content}”
