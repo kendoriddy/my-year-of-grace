@@ -6,11 +6,28 @@ import { getApprovedTestimony } from "@/lib/testimonies";
 import { formatLagosDate } from "@/lib/timezone";
 import { formatGraceNumber, truncate } from "@/lib/utils";
 
+export const runtime = "nodejs";
+
 const RATIOS = {
   og: { width: 1200, height: 630, quote: 220 },
   square: { width: 1080, height: 1080, quote: 200 },
   story: { width: 1080, height: 1920, quote: 280 },
 } as const;
+
+async function loadPhotoSrc(url: string | null | undefined) {
+  if (!url) return null;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const contentType = response.headers.get("content-type") || "image/jpeg";
+    if (!contentType.startsWith("image/")) return null;
+    const bytes = Buffer.from(await response.arrayBuffer());
+    if (bytes.byteLength === 0) return null;
+    return `data:${contentType};base64,${bytes.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(
   request: NextRequest,
@@ -38,6 +55,7 @@ export async function GET(
     ? "Anonymous"
     : testimony.displayName || "Anonymous";
   const size = RATIOS[ratio];
+  const photoSrc = await loadPhotoSrc(testimony.imageUrl);
 
   try {
     const image = new ImageResponse(
@@ -57,6 +75,7 @@ export async function GET(
         }
         author={author}
         ratio={ratio}
+        photoSrc={photoSrc}
       />,
       {
         width: size.width,
