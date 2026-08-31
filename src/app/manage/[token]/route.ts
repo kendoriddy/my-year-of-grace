@@ -35,7 +35,7 @@ export async function GET(
     return new NextResponse("Not found", { status: 404 });
   }
 
-  let destination = `/preserve/${matched.publicId}${submitted ? "?submitted=1" : ""}`;
+  let destination = `/t/${matched.publicId}${submitted ? "?submitted=1" : ""}`;
   if (matched.isLocked && matched.lockedArchive) {
     destination = `/${matched.lockedArchive.customSlug}`;
   }

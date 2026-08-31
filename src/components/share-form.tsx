@@ -67,8 +67,8 @@ export function ShareForm({ categories, defaultDate }: ShareFormProps) {
       trackEvent("testimony_complete", { publicId: data.publicId || "" });
       if (data.manageToken) {
         window.location.assign(`/manage/${data.manageToken}?submitted=1`);
-      } else {
-        window.location.assign(`/preserve/${data.publicId}?submitted=1`);
+      } else if (data.publicId) {
+        window.location.assign(`/t/${data.publicId}?submitted=1`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");

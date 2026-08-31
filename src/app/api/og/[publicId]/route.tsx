@@ -33,8 +33,7 @@ export async function GET(
       testimony.themeId,
   );
   const locked = Boolean(testimony.lockedArchive);
-  const customSlug =
-    testimony.lockedArchive?.customSlug ?? testimony.preferredSlug;
+  const customSlug = testimony.lockedArchive?.customSlug;
   const author = testimony.isAnonymous
     ? "Anonymous"
     : testimony.displayName || "Anonymous";
@@ -52,7 +51,7 @@ export async function GET(
             : "Shared in 2026"
         }
         urlLabel={
-          customSlug
+          locked && customSlug
             ? `myyearofgrace.com/${customSlug}`
             : `myyearofgrace.com/t/${publicId}`
         }
@@ -72,9 +71,10 @@ export async function GET(
 
     const headers = new Headers({
       "Content-Type": "image/png",
-      "Cache-Control": download
-        ? "no-store"
-        : "public, max-age=3600, stale-while-revalidate=86400",
+      "Cache-Control":
+        download || !locked
+          ? "no-store"
+          : "public, max-age=3600, stale-while-revalidate=86400",
     });
 
     if (download) {
