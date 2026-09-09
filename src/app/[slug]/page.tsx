@@ -51,6 +51,7 @@ export default async function LockedSlugPage({ params }: PageProps<"/[slug]">) {
   return (
     <KeepsakePage
       testimony={{
+        publicId: entry.testimony.publicId,
         content: entry.testimony.content,
         occurredOn: entry.testimony.occurredOn,
         author,
@@ -59,6 +60,7 @@ export default async function LockedSlugPage({ params }: PageProps<"/[slug]">) {
         archiveNumber: entry.archiveNumber,
         customSlug: entry.customSlug,
         paletteId: entry.themeId || entry.testimony.themeId,
+        clapCount: entry.testimony.clapCount,
       }}
     />
   );

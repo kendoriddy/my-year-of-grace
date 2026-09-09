@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { ClapButton } from "@/components/clap-button";
 import { getPalette, type PaletteId } from "@/lib/palettes";
 import { formatLagosDate } from "@/lib/timezone";
 import { formatGraceNumber, previewGraceNumber } from "@/lib/utils";
 
 export type KeepsakeData = {
+  publicId?: string;
   content: string;
   occurredOn: string | Date;
   author: string;
@@ -14,6 +16,7 @@ export type KeepsakeData = {
   archiveNumber?: number | null;
   customSlug: string;
   paletteId: PaletteId | string;
+  clapCount?: number;
 };
 
 type KeepsakePageProps = {
@@ -140,6 +143,19 @@ export function KeepsakePage({
           — {testimony.author}
           {testimony.location ? `, ${testimony.location}` : ""}
         </p>
+
+        {testimony.publicId && !preview && (
+          <div
+            className="keepsake-reveal mt-10 flex justify-center"
+            style={{ animationDelay: "0.7s" }}
+          >
+            <ClapButton
+              publicId={testimony.publicId}
+              initialCount={testimony.clapCount ?? 0}
+              muted
+            />
+          </div>
+        )}
 
         <div
           className="keepsake-reveal mx-auto mt-12 max-w-md border-t border-[color:var(--k-accent)]/25 pt-8"

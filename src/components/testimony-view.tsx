@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ClapButton } from "@/components/clap-button";
 import { PreserveBenefits } from "@/components/preserve-benefits";
 import { ShareButtons } from "@/components/share-buttons";
 import { ShareCard } from "@/components/share-card";
@@ -21,6 +22,7 @@ type TestimonyViewProps = {
     email: string | null;
     imageUrl?: string | null;
     isLocked: boolean;
+    clapCount?: number;
     category: { emoji: string; name: string };
     lockedArchive?: {
       archiveNumber: number;
@@ -96,6 +98,13 @@ export async function TestimonyView({
           Preserved in the 2026 Grace Archive
         </p>
       )}
+
+      <div className="mt-8">
+        <ClapButton
+          publicId={testimony.publicId}
+          initialCount={testimony.clapCount ?? 0}
+        />
+      </div>
 
       {!locked && showLockCta && !archiveStats.isFull && (
         <div className="mt-8">
