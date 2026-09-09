@@ -64,11 +64,13 @@ model Testimony {
   featuredOn      DateTime?       @db.Date
   contentHash     String
   ipHash          String?
+  clapCount       Int             @default(0)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   lockedArchive   LockedArchive?
   payments        Payment[]
   shares          Share[]
+  claps           Clap[]
 
   @@index([occurredOn])
   @@index([status])
@@ -76,6 +78,7 @@ model Testimony {
   @@index([isLocked])
   @@index([isFeatured])
   @@index([preferredSlug])
+  @@index([clapCount])
 }
 
 model LockedArchive {
@@ -133,6 +136,18 @@ model Share {
   createdAt   DateTime      @default(now())
 
   @@index([testimonyId])
+}
+
+model Clap {
+  id          String    @id @default(cuid())
+  testimonyId String
+  testimony   Testimony @relation(fields: [testimonyId], references: [id])
+  visitorId   String?
+  ipHash      String?
+  createdAt   DateTime  @default(now())
+
+  @@index([testimonyId])
+  @@index([testimonyId, visitorId])
 }
 
 model Setting {

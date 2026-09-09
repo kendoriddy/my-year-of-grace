@@ -68,6 +68,7 @@ export default async function PreserveSuccessPage({
       <div className="overflow-hidden rounded-[2rem] border border-ink/10 mx-3 md:mx-8">
         <KeepsakePage
           testimony={{
+            publicId,
             content: refreshed.content,
             occurredOn: refreshed.occurredOn,
             author,
@@ -76,6 +77,7 @@ export default async function PreserveSuccessPage({
             archiveNumber: refreshed.lockedArchive.archiveNumber,
             customSlug: refreshed.lockedArchive.customSlug,
             paletteId: refreshed.lockedArchive.themeId || refreshed.themeId,
+            clapCount: refreshed.clapCount,
           }}
           showAcquisition={false}
         />

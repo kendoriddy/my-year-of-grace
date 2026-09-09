@@ -94,3 +94,7 @@ export const MODERATION_KEYWORDS = [
 ];
 
 export const MANAGE_COOKIE = "yog_manage_tokens";
+export const VISITOR_COOKIE = "yog_visitor_id";
+
+/** Soft cap on claps from one visitor for a single testimony (Medium-style). */
+export const MAX_CLAPS_PER_VISITOR = 50;
