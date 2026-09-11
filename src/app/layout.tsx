@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { ReferralTracker } from "@/components/referral-tracker";
 import { CANONICAL_DOMAIN } from "@/lib/env";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </PostHogProvider>
+        <Analytics />
       </body>
     </html>
   );
